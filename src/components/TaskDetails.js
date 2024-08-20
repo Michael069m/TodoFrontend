@@ -10,6 +10,7 @@ const TaskDetails = ({ onUpdateTask }) => {
   const [description, setDescription] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [priority, setPriority] = useState("None"); // New state for priority
   const [responseMessage, setResponseMessage] = useState("");
   const [user, setUser] = useState(null);
 
@@ -27,10 +28,20 @@ const TaskDetails = ({ onUpdateTask }) => {
     if (currTask) {
       setSummary(currTask.summary || "");
       setDescription(currTask.description || "");
+      setPriority(currTask.priority || "None"); // Set priority from current task
+
+      // Convert ISO date to a format suitable for datetime-local input
+      const formatDate = (isoDate) => {
+        const date = new Date(isoDate);
+        const offset = date.getTimezoneOffset();
+        const localDate = new Date(date.getTime() - offset * 60 * 1000);
+        return localDate.toISOString().slice(0, 16);
+      };
+
       setStart(
-        currTask.start.dateTime || new Date().toISOString().slice(0, 10)
-      ); // Format for date input
-      setEnd(currTask.end.dateTime || new Date().toISOString().slice(0, 10));
+        formatDate(currTask.start) || new Date().toISOString().slice(0, 16)
+      );
+      setEnd(formatDate(currTask.end) || new Date().toISOString().slice(0, 16));
     }
   }, [currTask]);
 
@@ -42,18 +53,18 @@ const TaskDetails = ({ onUpdateTask }) => {
       return;
     }
 
-    // Ensure currTask has an eventId before proceeding
     if (!currTask.eventId) {
       setResponseMessage("Event ID is missing.");
       return;
     }
 
     const updatedTask = {
-      eventId: currTask.eventId, // Ensure this is the correct ID
+      eventId: currTask.eventId,
       summary,
       description,
       start: new Date(start).toISOString(),
       end: new Date(end).toISOString(),
+      priority, // Include priority in the updated task
     };
 
     try {
@@ -75,25 +86,22 @@ const TaskDetails = ({ onUpdateTask }) => {
   };
 
   const handleDelete = async () => {
-    // Check if user is authenticated and if there is a current task with an ID
     if (!user || !currTask.eventId) {
       setResponseMessage("Cannot delete task. Please try again.");
       return;
     }
 
     try {
-      // Make a DELETE request to the backend to delete the event
       const response = await axios.delete(
         "http://localhost:8000/delete-event",
         {
-          data: { eventId: currTask.eventId }, // Send the event ID in the request body
-          params: { email: user.email }, // Send the user's email as a query parameter
+          data: { eventId: currTask.eventId, isSync: currTask.isSync },
+          params: { email: user.email },
         }
       );
 
-      // Handle the response from the server
       setResponseMessage(response.data.message || "Task deleted successfully!");
-      setCurrTask(null); // Clear the current task from the context
+      setCurrTask(null);
     } catch (error) {
       console.error("Error deleting task:", error);
       setResponseMessage("Failed to delete task. Please try again.");
@@ -131,7 +139,7 @@ const TaskDetails = ({ onUpdateTask }) => {
       <div className="mb-4">
         <label className="block text-gray-700">Start date</label>
         <input
-          type="date"
+          type="datetime-local"
           className="w-full p-2 border rounded-lg"
           value={start}
           onChange={(e) => setStart(e.target.value)}
@@ -141,11 +149,25 @@ const TaskDetails = ({ onUpdateTask }) => {
       <div className="mb-4">
         <label className="block text-gray-700">Due date</label>
         <input
-          type="date"
+          type="datetime-local"
           className="w-full p-2 border rounded-lg"
           value={end}
           onChange={(e) => setEnd(e.target.value)}
         />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700">Priority</label>
+        <select
+          className="w-full p-2 border rounded-lg bg-gray-50"
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option value="None">None</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
       </div>
 
       <div className="flex justify-between">

@@ -63,10 +63,10 @@ function Home() {
     setCurrTask(updatedTask); // Optionally, update the selected task as well
   };
 
-  const addTask = (newTask) => {
-    const newId = tasks.length ? tasks[tasks.length - 1].id + 1 : 1;
-    setTasks([...tasks, { id: newId, ...newTask }]);
-  };
+  // const addTask = (newTask) => {
+  //   const newId = tasks.length ? tasks[tasks.length - 1].id + 1 : 1;
+  //   setTasks([...tasks, { id: newId, ...newTask }]);
+  // };
 
   const [addTaskButton, setAddTaskButton] = useState(false);
 
@@ -78,7 +78,8 @@ function Home() {
         <TaskList
           tasks={events}
           // onTaskClick={}
-          onAddTask={addTask}
+          // onAddTask={addTask}
+          handleUpdateTask={handleUpdateTask}
           addTaskButton={addTaskButton}
           setAddTaskButton={setAddTaskButton}
         />
