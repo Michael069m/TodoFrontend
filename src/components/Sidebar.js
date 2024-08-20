@@ -18,6 +18,7 @@ const Sidebar = ({ highlight }) => {
         withCredentials: true,
       });
       Cookies.remove("userData"); // Remove user data cookie
+      window.location.reload();
       console.log(response);
 
       // Redirect to login page after logout

@@ -22,7 +22,21 @@ const GoogleCalendar = () => {
           scope: "https://www.googleapis.com/auth/calendar.events.readonly",
         })
         .then(() => {
-          gapi.auth2.getAuthInstance().signIn().then(loadCalendarEvents);
+          const token = getCookie("google_token");
+          if (token) {
+            gapi.client.setToken({ access_token: token });
+            loadCalendarEvents();
+          } else {
+            const authInstance = gapi.auth2.getAuthInstance();
+            if (authInstance.isSignedIn.get()) {
+              const currentUser = authInstance.currentUser.get();
+              const accessToken = currentUser.getAuthResponse().access_token;
+              document.cookie = `google_token=${accessToken}; path=/;`;
+              loadCalendarEvents();
+            } else {
+              console.error("User is not signed in and no token found.");
+            }
+          }
         });
     };
     gapi.load("client:auth2", start);
@@ -44,18 +58,25 @@ const GoogleCalendar = () => {
           end: new Date(event.end.dateTime || event.end.date),
           title: event.summary,
         }));
-        setEvents(events); // Update the state with the fetched events
+        setEvents(events);
       });
   };
 
+  const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
+  };
+
   return (
-    <div className="App">
+    <div className="App ">
       <Calendar
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
+        style={{ height: 800 }}
       />
     </div>
   );

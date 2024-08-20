@@ -43,11 +43,17 @@ function Home() {
   }, [navigate, events]);
 
   const { tasks, setTasks } = useContext(TaskContext);
-  const { currTask, setCurrTask } = useContext(TaskContext);
+  const [currTask, setCurrTask] = useState({
+    summary: "",
+    description: "",
+    start: new Date().toISOString(),
+    end: new Date().toISOString(),
+  });
 
-  const handleSelectTask = (task) => {
-    setCurrTask(task);
-  };
+  // const handleSelectTask = (task) => {
+  //   setCurrTask(task);
+  //   // console.log("currTask", currTask);
+  // };
 
   const handleUpdateTask = (updatedTask) => {
     const updatedTasks = tasks.map((task) =>
@@ -71,13 +77,15 @@ function Home() {
         <Sidebar highlight={1} />
         <TaskList
           tasks={events}
-          onTaskClick={handleSelectTask}
+          // onTaskClick={}
           onAddTask={addTask}
           addTaskButton={addTaskButton}
           setAddTaskButton={setAddTaskButton}
         />
         <TaskDetails
-          // // currTask={currTask}
+          // currTask={currTask}
+          // setCurrTask={setCurrTask}
+          // tasks={events}
           onUpdateTask={handleUpdateTask}
         />
       </div>

@@ -5,7 +5,7 @@ import { TaskContext } from "../contexts/TaskProvider.js";
 
 const TaskList = ({
   tasks,
-  onTaskClick,
+  // onTaskClick,
   onAddTask,
   addTaskButton,
   setAddTaskButton,
@@ -26,73 +26,7 @@ const TaskList = ({
     }
   };
   const handleCheckboxChange = () => {};
-  // const { currTask, setCurrTask } = useContext(TaskContext);
 
-  // const [summary, setSummary] = useState(currTask.summary || "");
-  // const [description, setDescription] = useState(currTask.description || "");
-  // const [start, setStart] = useState(currTask.start.dateTime || "");
-  // const [end, setEnd] = useState(currTask.end.dateTime || "");
-  // const [responseMessage, setResponseMessage] = useState("");
-  // const [user, setUser] = useState(null);
-  // const [eventId, setEventId] = useState(null);
-  // const event = null;
-  // const handleSave = async () => {
-  //   event.preventDefault();
-  //   if (!user) {
-  //     setResponseMessage("User is not authenticated.");
-  //     return;
-  //   }
-
-  //   const updatedTask = {
-  //     summary,
-  //     description,
-  //     start: new Date(start).toISOString(),
-  //     end: new Date(end).toISOString(),
-  //   };
-
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:8000/schedule-event`, // Assuming `currTask.id` is the task ID
-  //       updatedTask,
-  //       {
-  //         params: { email: user.email },
-  //       }
-  //     );
-  //     setResponseMessage(response.data.message || "Task updated successfully!");
-  //     // onUpdateTask(updatedTask);
-  //   } catch (error) {
-  //     console.error("Error updating task:", error);
-  //     setResponseMessage("Failed to update task. Please try again.");
-  //   }
-  // };
-
-  // const handleDelete = async () => {
-  //   if (!user || !currTask.id) {
-  //     setResponseMessage("Cannot delete task. Please try again.");
-  //     return;
-  //   }
-
-  //   try {
-  //     const response = await axios.delete(
-  //       `http://localhost:8000/tasks/${currTask.id}`,
-  //       {
-  //         params: { email: user.email },
-  //       }
-  //     );
-  //     setResponseMessage(response.data.message || "Task deleted successfully!");
-  //     // Optionally, clear the current task from context or UI
-  //     setCurrTask(null);
-  //   } catch (error) {
-  //     console.error("Error deleting task:", error);
-  //     setResponseMessage("Failed to delete task. Please try again.");
-  //   }
-  // };
-
-  // if (!currTask) {
-  //   return (
-  //     <div className="p-4 rounded-lg w-1/3">Select a task to view details</div>
-  //   );
-  // }
   const [summary, setSummary] = useState("");
   const [description, setDescription] = useState("");
   const [start, setStart] = useState("");
@@ -168,10 +102,20 @@ const TaskList = ({
       setResponseMessage("Failed to delete event. Please try again.");
     }
   };
+
+  const onTaskClick = (task) => {
+    setCurrTask(task);
+  };
+
+  useEffect(() => {
+    if (currTask !== null) {
+      console.log("currTask", currTask);
+    }
+  }, [currTask]);
   // onUpdateTask
   return (
     <div className=" border-r-[2px] border-solid border-[rgb(228,224,138)]">
-      <div className="p-4 h-full rounded-lg w-[40vw] ">
+      <div className="p-4 h-full rounded-lg w-[40vw] overflow-auto ">
         <h2 className="text-[40px] font-bold mb-4">Tasks</h2>
         {/* <form className="mt-4" onSubmit={handleAddTask}>
           <input
@@ -220,7 +164,7 @@ const TaskList = ({
             <div className="mb-4">
               <label className="block text-gray-700">Start date</label>
               <input
-                type="date"
+                type="datetime-local"
                 className="w-full p-2 border rounded-lg"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
@@ -230,7 +174,7 @@ const TaskList = ({
             <div className="mb-4">
               <label className="block text-gray-700">Due date</label>
               <input
-                type="date"
+                type="datetime-local"
                 className="w-full p-2 border rounded-lg"
                 value={end}
                 onChange={(e) => setEnd(e.target.value)}
