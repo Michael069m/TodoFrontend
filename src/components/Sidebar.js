@@ -25,9 +25,12 @@ const Sidebar = ({ highlight }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/logout", {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:8000/auth/google/logout",
+        {
+          withCredentials: true,
+        }
+      );
       Cookies.remove("userData"); // Remove user data cookie
       window.location.reload();
       console.log(response);

@@ -13,6 +13,7 @@ const TaskDetails = ({ onUpdateTask }) => {
   const [priority, setPriority] = useState("None"); // New state for priority
   const [responseMessage, setResponseMessage] = useState("");
   const [user, setUser] = useState(null);
+  const [isSync, setIsSync] = useState(false);
 
   useEffect(() => {
     const userDataCookie = Cookies.get("userData");
@@ -24,20 +25,34 @@ const TaskDetails = ({ onUpdateTask }) => {
     }
   }, []);
 
+  const formatDate = (isoDate) => {
+    if (!isoDate) {
+      console.error("Invalid ISO Date:", isoDate);
+      return ""; // Return an empty string if isoDate is invalid
+    }
+    try {
+      const date = new Date(isoDate);
+      if (isNaN(date.getTime())) {
+        console.error("Invalid date object created from ISO date:", isoDate);
+        return ""; // Return an empty string if date is invalid
+      }
+      // Adjust for local timezone offset
+      const offset = date.getTimezoneOffset();
+      const localDate = new Date(date.getTime() - offset * 60 * 1000);
+      return localDate.toISOString().slice(0, 16);
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return ""; // Return an empty string in case of error
+    }
+  };
   useEffect(() => {
     if (currTask) {
       setSummary(currTask.summary || "");
       setDescription(currTask.description || "");
-      setPriority(currTask.priority || "None"); // Set priority from current task
+      setPriority(currTask.priority || "None");
+      setIsSync(currTask.isSync || false);
 
-      // Convert ISO date to a format suitable for datetime-local input
-      const formatDate = (isoDate) => {
-        const date = new Date(isoDate);
-        const offset = date.getTimezoneOffset();
-        const localDate = new Date(date.getTime() - offset * 60 * 1000);
-        return localDate.toISOString().slice(0, 16);
-      };
-
+      // Handle potentially undefined start and end times safely
       setStart(
         formatDate(currTask.start) || new Date().toISOString().slice(0, 16)
       );
@@ -64,12 +79,13 @@ const TaskDetails = ({ onUpdateTask }) => {
       description,
       start: new Date(start).toISOString(),
       end: new Date(end).toISOString(),
-      priority, // Include priority in the updated task
+      priority,
+      isSync,
     };
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/update-event`,
+        `http://localhost:8000/calendar/update-event`,
         updatedTask,
         {
           params: { email: user.email },
@@ -93,7 +109,7 @@ const TaskDetails = ({ onUpdateTask }) => {
 
     try {
       const response = await axios.delete(
-        "http://localhost:8000/delete-event",
+        "http://localhost:8000/calendar/delete-event",
         {
           data: { eventId: currTask.eventId, isSync: currTask.isSync },
           params: { email: user.email },
@@ -168,6 +184,17 @@ const TaskDetails = ({ onUpdateTask }) => {
           <option value="Medium">Medium</option>
           <option value="High">High</option>
         </select>
+      </div>
+      <div className="mb-4">
+        <p className="relative pl-8 ">
+          <input
+            type="checkbox"
+            className="form-checkbox absolute left-2  h-5 w-5 bg-[hsl(237,100%,68%)] rounded"
+            checked={isSync}
+            onChange={() => setIsSync(!isSync)}
+          />
+          Sync to Google Calendar
+        </p>
       </div>
 
       <div className="flex justify-between">

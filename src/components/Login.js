@@ -1,7 +1,4 @@
 import React, { useState } from "react";
-import { useGoogleLogin } from "@react-oauth/google";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import axios from "axios";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +20,7 @@ const Login = () => {
   // };
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-    window.location.href = "http://localhost:8000/google";
+    window.location.href = "http://localhost:8000/auth/google";
   };
 
   return (

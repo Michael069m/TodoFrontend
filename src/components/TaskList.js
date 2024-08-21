@@ -40,7 +40,7 @@ const TaskList = ({
       };
 
       const response = await axios.put(
-        "http://localhost:8000/complete-event",
+        "http://localhost:8000/calendar/complete-event",
         {
           eventId: updatedTask.eventId,
           isComplete: updatedTask.isComplete,
@@ -78,7 +78,7 @@ const TaskList = ({
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/schedule-event",
+        "http://localhost:8000/calendar/schedule-event",
         eventData,
         {
           params: { email: user.email },
@@ -223,7 +223,7 @@ const TaskList = ({
             </div>
 
             <div className="flex justify-between ">
-              {responseMessage && <p>{responseMessage}</p>}
+              {/* {responseMessage && <p>{responseMessage}</p>} */}
               <button></button>
               <button
                 className="px-4 py-2 bg-green-500 text-white rounded-lg "

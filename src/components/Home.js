@@ -19,10 +19,13 @@ function Home() {
         const userData = Cookies.get("userData");
         if (userData) {
           const user = JSON.parse(userData);
-          const response = await axios.get("http://localhost:8000/events", {
-            params: { email: user.email },
-            withCredentials: true, // Ensure cookies are sent with request
-          });
+          const response = await axios.get(
+            "http://localhost:8000/calendar/events",
+            {
+              params: { email: user.email },
+              withCredentials: true, // Ensure cookies are sent with request
+            }
+          );
           setEvents(response.data || []); // Directly set the data
         } else {
           console.error("User is not authenticated.");
